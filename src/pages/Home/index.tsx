@@ -26,23 +26,28 @@ const Home = (): JSX.Element => {
   const { addProduct, cart } = useCart();
 
   const cartItemsAmount = cart.reduce((sumAmount, product) => {
-    // TODO
-    const items = {};
-
-    return items;
+    const newSumAmount = { ...sumAmount };
+    newSumAmount[product.id] = product.amount;
+    return newSumAmount;
   }, {} as CartItemsAmount);
 
   useEffect(() => {
     async function loadProducts() {
-      const response = await api.get('/products');
-      setProducts(response.data);
+      const response = await api.get<Product[]>('/products');
+
+      const data = response.data.map((product) => ({
+        ...product,
+        priceFormatted: formatPrice(product.price),
+      }));
+
+      setProducts(data);
     }
 
     loadProducts();
   }, []);
 
   function handleAddProduct(id: number) {
-    // TODO
+    addProduct(id);
   }
 
   return (
@@ -55,11 +60,11 @@ const Home = (): JSX.Element => {
           <button
             type='button'
             data-testid='add-product-button'
-            // onClick={() => handleAddProduct(product.id)}
+            onClick={() => handleAddProduct(product.id)}
           >
             <div data-testid='cart-product-quantity'>
               <MdAddShoppingCart size={16} color='#FFF' />
-              {/* {cartItemsAmount[product.id] || 0} */} 2
+              {cartItemsAmount[product.id] || 0}
             </div>
 
             <span>ADICIONAR AO CARRINHO</span>
